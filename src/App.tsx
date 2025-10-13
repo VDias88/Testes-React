@@ -2,15 +2,7 @@ import BlackHoleHero from '@components/blackHole'
 import './App.css'
 
 export default function App() {
-  return (    
-
-
-
-
-
-
-
-
+  return (
 
     <BlackHoleHero
       title="Vinicius Monteiro"
