@@ -6,10 +6,10 @@ import checker from 'vite-plugin-checker';
 
 export default defineConfig({
   server: {
-    host: true,             
+    host: true,
     strictPort: true,
     watch: {
-      usePolling: true,      
+      usePolling: true,
       interval: 100
     }
   },

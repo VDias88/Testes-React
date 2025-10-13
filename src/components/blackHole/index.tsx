@@ -1,203 +1,153 @@
-import React, { useEffect, useRef } from 'react';
+import * as THREE from 'three'
+import './styles.css'
+import React, { useMemo, useRef } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { OrbitControls } from '@react-three/drei'
+import { EffectComposer, Bloom } from '@react-three/postprocessing'
 
-/**
- * BlackHoleHero — versão sem Tailwind e mais fiel à imagem de referência.
- * Ajustes principais:
- * - Paleta mais verde-escura com dourado quente (#e7b84a) e fundo #0b100a.
- * - Anel com textura turbulenta (SVG) e penumbra espessa.
- * - Vignette forte e "nuvens" ao redor usando feTurbulence + mask.
- * - Núcleo negro absoluto e transições suaves.
- */
-export default function BlackHoleHero({ title, subtitle }) {
-  const ringRef = useRef(null);
+const GOLD = new THREE.Color('#e7b84a')
+const BG = '#0b100a'
 
-  // Rotação lentíssima do ruído para simular fluxo da matéria
-  useEffect(() => {
-    let raf;
-    const tick = () => {
-      if (ringRef.current) {
-        const t = (Date.now() / 60000) * 360; // 1 volta por minuto
-        ringRef.current.style.transform = `translate(-50%, -50%) rotate(${t}deg)`;
+// function Core() {
+//   // disco negro
+//   return (
+//     <mesh position={[0, 0, 0]}>
+//       <circleGeometry args={[2.4, 256]} />
+//       <meshBasicMaterial color="black" />
+//     </mesh>
+//   )
+// }
+
+function Core3D() {
+  const uniforms = useMemo(
+    () => ({
+      uTime: { value: 0 },
+      uColorCenter: { value: new THREE.Color(0x000000) },
+      uColorEdge: { value: new THREE.Color(0x1a1a1a) },
+    }),
+    []
+  )
+
+  const mat = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms,
+        side: THREE.FrontSide,
+        transparent: true,
+        vertexShader: /* glsl */ `
+          varying vec3 vNormal;
+          varying vec3 vWorldPosition;
+          void main() {
+            vNormal = normalize(normalMatrix * normal);
+            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+            vWorldPosition = worldPosition.xyz;
+            gl_Position = projectionMatrix * viewMatrix * worldPosition;
+          }
+        `,
+        fragmentShader: /* glsl */ `
+          varying vec3 vNormal;
+          varying vec3 vWorldPosition;
+          uniform vec3 uColorCenter;
+          uniform vec3 uColorEdge;
+
+          void main() {
+            // centro negro profundo
+            float fresnel = pow(1.0 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+            vec3 color = mix(uColorCenter, uColorEdge, fresnel);
+            // halo muito sutil
+            float vignette = smoothstep(0.2, 1.0, fresnel);
+            gl_FragColor = vec4(color, 1.0);
+          }
+        `,
+      }),
+    [uniforms]
+  )
+
+  // rotação lenta
+  const meshRef = useRef<THREE.Mesh>(null)
+  useFrame((_, dt) => {
+    if (meshRef.current) meshRef.current.rotation.y += dt * 0.1
+  })
+
+  return (
+    <mesh ref={meshRef}>
+      <sphereGeometry args={[2.4, 128, 128]} />
+      <primitive object={mat} attach="material" />
+    </mesh>
+  )
+}
+
+
+
+function DustInfall() {
+  const COUNT = 25000
+  const geom = useMemo(() => new THREE.BufferGeometry(), [])
+  const positions = useMemo(() => new Float32Array(COUNT * 3), [COUNT])
+  const speeds = useMemo(() => new Float32Array(COUNT), [COUNT])
+  const angles = useMemo(() => new Float32Array(COUNT), [COUNT])
+  const radii = useMemo(() => new Float32Array(COUNT), [COUNT])
+
+  useMemo(() => {
+    for (let i = 0; i < COUNT; i++) {
+      const r = (radii[i] = THREE.MathUtils.mapLinear(Math.random(), 0, 1, 3.2, 8.0) * (1 + Math.random() * 0.2))
+      angles[i] = Math.random() * Math.PI * 2
+      speeds[i] = THREE.MathUtils.randFloat(0.18, 0.55)
+      positions[i * 3 + 0] = Math.cos(angles[i]) * r
+      positions[i * 3 + 1] = Math.sin(angles[i]) * r
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 0.25
+    }
+    geom.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  }, [geom, positions, angles, radii, speeds])
+
+  useFrame((_, dt) => {
+    const pos = geom.attributes.position.array as Float32Array
+    const d = Math.min(0.033, dt)
+    for (let i = 0; i < COUNT; i++) {
+      let r = radii[i]
+      let ang = angles[i]
+      r -= speeds[i] * d * (0.6 + 1.2 * (1.0 / (0.2 + r)))
+      ang += d * (0.25 + 2.0 / (0.2 + r))
+      if (r < 2.5) {
+        r = radii[i] = THREE.MathUtils.randFloat(6.0, 8.5)
+        ang = angles[i] = Math.random() * Math.PI * 2
+        speeds[i] = THREE.MathUtils.randFloat(0.18, 0.55)
+        pos[i * 3 + 2] = (Math.random() - 0.5) * 0.25
+      } else {
+        radii[i] = r
+        angles[i] = ang
       }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, []);
+      pos[i * 3 + 0] = Math.cos(ang) * r
+      pos[i * 3 + 1] = Math.sin(ang) * r
+    }
+    geom.attributes.position.needsUpdate = true
+  })
 
   return (
-    <section style={styles.section}>
-      {/* Vignette e leve tonalização esverdeada */}
-      <div style={styles.vignette} />
-
-      {/* Camada de nuvens/poeira com máscara em volta do anel */}
-      <div style={styles.clouds}>
-        <CloudsMask />
-      </div>
-
-      {/* Anel dourado texturizado */}
-      <div ref={ringRef} style={styles.ringWrap}>
-        <AccretionRing />
-      </div>
-
-      {/* Núcleo negro absoluto */}
-      <div style={styles.core} />
-
-      {/* Textos opcionais (desligados por padrão para ficar fiel à arte) */}
-      {(title || subtitle) && (
-        <div style={styles.textContainer}>
-          {title && <h1 style={styles.title}>{title}</h1>}
-          {subtitle && <p style={styles.subtitle}>{subtitle}</p>}
-        </div>
-      )}
-    </section>
-  );
+    <points geometry={geom}>
+      <pointsMaterial color={GOLD} size={0.015} transparent opacity={0.9} depthWrite={false} blending={THREE.AdditiveBlending} />
+    </points>
+  )
 }
 
-// === CAMADAS/COMPONENTES ===
-
-// Anel com gradiente radial + ruído para borda "felpuda"
-function AccretionRing() {
-  const size = 620; // maior para borda difusa
+export const BlackHole = ()=> {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      style={{ display: 'block' }}
-      xmlns="http://www.w3.org/2000/svg"
+    <Canvas
+      gl={{ powerPreference: 'high-performance', antialias: true }}
+      camera={{ position: [0, 0, 9], fov: 50 }}
+      onCreated={({ gl }) => {
+        gl.setClearColor(BG)
+        gl.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+      }}
     >
-      <defs>
-        {/* Gradiente dourado inspirado na referência */}
-        <radialGradient id="gold" cx="50%" cy="50%" r="50%">
-          <stop offset="40%" stopColor="#000000" />
-          <stop offset="56%" stopColor="#e7b84a" stopOpacity="0.75" />
-          <stop offset="72%" stopColor="#d3a23e" stopOpacity="0.38" />
-          <stop offset="86%" stopColor="#8b6a1e" stopOpacity="0.18" />
-          <stop offset="100%" stopColor="#00000000" />
-        </radialGradient>
 
-        {/* Ruído para borda orgânica */}
-        <filter id="ringNoise" x="-20%" y="-20%" width="140%" height="140%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" seed="7" />
-          <feGaussianBlur stdDeviation="0.7" />
-          <feColorMatrix type="saturate" values="0.25" />
-          <feComponentTransfer>
-            <feFuncA type="table" tableValues="0 0.7" />
-          </feComponentTransfer>
-          <feBlend mode="multiply" in2="SourceGraphic" />
-        </filter>
+      <Core3D />
+      {/* <DustInfall /> */}
 
-        {/* Suaviza a transição usando máscara radial */}
-        <radialGradient id="softMask" cx="50%" cy="50%" r="50%">
-          <stop offset="45%" stopColor="#ffffff" />
-          <stop offset="75%" stopColor="#ffffff" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#000000" stopOpacity="0" />
-        </radialGradient>
-        <mask id="maskSoft">
-          <rect width="100%" height="100%" fill="url(#softMask)" />
-        </mask>
-      </defs>
+      <EffectComposer>
+        <Bloom intensity={1.15} radius={0.8} threshold={0.0} />
+      </EffectComposer>
 
-      <g filter="url(#ringNoise)" mask="url(#maskSoft)">
-        <rect width="100%" height="100%" fill="url(#gold)" />
-      </g>
-    </svg>
-  );
+      <OrbitControls enablePan={false} enableZoom={false} rotateSpeed={0.25} />
+    </Canvas>
+  )
 }
-
-// Nuvens externas com máscara circular para dar sensação de espiral difusa
-function CloudsMask() {
-  return (
-    <svg
-      width="100%"
-      height="100%"
-      viewBox="0 0 100 100"
-      preserveAspectRatio="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ display: 'block' }}
-    >
-      <defs>
-        <filter id="cloudsNoise">
-          <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="4" seed="11" />
-          <feGaussianBlur stdDeviation="0.6" />
-        </filter>
-        <radialGradient id="cloudsMask" cx="50%" cy="50%" r="60%">
-          <stop offset="35%" stopColor="#000" stopOpacity="0" />
-          <stop offset="60%" stopColor="#fff" stopOpacity="0.65" />
-          <stop offset="100%" stopColor="#fff" stopOpacity="0.85" />
-        </radialGradient>
-        <mask id="mClouds">
-          <rect x="0" y="0" width="100" height="100" fill="url(#cloudsMask)" />
-        </mask>
-      </defs>
-
-      {/* camada esverdeada-escura com nuvens multiplicadas */}
-      <rect x="0" y="0" width="100" height="100" fill="#0b100a" />
-      <g mask="url(#mClouds)" filter="url(#cloudsNoise)">
-        <rect x="0" y="0" width="100" height="100" fill="#1a2318" />
-      </g>
-    </svg>
-  );
-}
-
-// === ESTILOS ===
-const styles = {
-  section: {
-    position: 'relative',
-    minHeight: '100vh',
-    width: '100%',
-    overflow: 'hidden',
-    backgroundColor: '#0b100a', // base verde-escuro
-  },
-  vignette: {
-    position: 'absolute',
-    inset: 0,
-    background:
-      'radial-gradient(circle at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0.75) 100%)',
-    pointerEvents: 'none',
-  },
-  clouds: {
-    position: 'absolute',
-    inset: 0,
-    opacity: 0.6,
-    mixBlendMode: 'multiply',
-  },
-  ringWrap: {
-    position: 'absolute',
-    left: '50%',
-    top: '50%',
-    transform: 'translate(-50%, -50%)',
-    filter: 'drop-shadow(0 0 60px rgba(231,184,74,0.15))',
-  },
-  core: {
-    position: 'absolute',
-    left: '50%',
-    top: '50%',
-    width: 460,
-    height: 460,
-    transform: 'translate(-50%, -50%)',
-    borderRadius: '50%',
-    background: '#000', // núcleo negro absoluto
-    boxShadow: '0 0 140px 40px rgba(0,0,0,0.9) inset',
-  },
-  textContainer: {
-    position: 'absolute',
-    bottom: '8vh',
-    width: '100%',
-    textAlign: 'center',
-    color: '#e7b84a',
-  },
-  title: {
-    margin: 0,
-    fontSize: '2.6rem',
-    letterSpacing: '0.12em',
-    textTransform: 'uppercase',
-    textShadow: '0 0 12px rgba(231,184,74,0.35)',
-  },
-  subtitle: {
-    marginTop: '0.5rem',
-    fontSize: '1rem',
-    color: 'rgba(231,184,74,0.8)',
-  },
-};
