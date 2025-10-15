@@ -1,16 +1,16 @@
-import { defineConfig } from 'eslint/config'
-import js from '@eslint/js'
-import react from 'eslint-plugin-react'
-import reactHooks from 'eslint-plugin-react-hooks'
-import prettier from 'eslint-config-prettier'
-import prettierPlugin from 'eslint-plugin-prettier'
-import globals from 'globals'
-import tseslint from 'typescript-eslint'
+import { defineConfig } from 'eslint/config';
+import js from '@eslint/js';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import prettier from 'eslint-config-prettier';
+import prettierPlugin from 'eslint-plugin-prettier';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default defineConfig([
   { ignores: ['dist', 'build', 'node_modules'] },
   js.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked.map((cfg) => ({
+  ...tseslint.configs.recommendedTypeChecked.map(cfg => ({
     ...cfg,
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
@@ -62,5 +62,4 @@ export default defineConfig([
     },
   },
   prettier,
-])
-
+]);

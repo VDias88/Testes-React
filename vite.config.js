@@ -10,8 +10,8 @@ export default defineConfig({
     strictPort: true,
     watch: {
       usePolling: true,
-      interval: 100
-    }
+      interval: 100,
+    },
   },
   plugins: [
     react(),
@@ -20,7 +20,7 @@ export default defineConfig({
       // eslint: {
       //   lintCommand: 'eslint . --ext .ts,.tsx,.js,.jsx'
       // }
-    })
+    }),
   ],
   resolve: {
     alias: {

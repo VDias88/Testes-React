@@ -1,7 +1,43 @@
-html, body, #root { height: 100%; margin: 0; background: #0b100a; }
-#root::after{
-  content:""; position:fixed; inset:0; pointer-events:none;
-  background: radial-gradient(circle at 50% 50%,
-              rgba(0,0,0,0) 55%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0.8) 100%);
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
-canvas { display:block; }
+
+.black-hole-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  background: black;
+}
+
+.black-hole-container::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgb(0 0 0 / 0%) 55%,
+    rgb(0 0 0 / 35%) 75%,
+    rgb(0 0 0 / 80%) 100%
+  );
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgb(0 0 0 / 0%) 55%,
+    rgb(0 0 0 / 35%) 75%,
+    rgb(0 0 0 / 80%) 100%
+  );
+}

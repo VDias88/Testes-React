@@ -1,10 +1,9 @@
-
-import './App.css'
-import Menu from '@components/Menu'
-import { Route, Routes } from 'react-router'
-import Home from './routes/Home'
-import { BlackHole } from './routes/BlackHole'
-import Teste from './routes/Teste'
+import './App.css';
+import Menu from '@components/Menu';
+import { Route, Routes } from 'react-router';
+import Home from './routes/Home';
+import { BlackHole } from './routes/BlackHole';
+import Teste from './routes/Teste';
 
 export default function App() {
   return (
@@ -16,5 +15,5 @@ export default function App() {
         <Route path="/test" element={<Teste />} />
       </Routes>
     </>
-  )
-};
+  );
+}
