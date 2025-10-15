@@ -141,7 +141,7 @@ export const BlackHole = ()=> {
     >
 
       <Core3D />
-      {/* <DustInfall /> */}
+      <DustInfall />
 
       <EffectComposer>
         <Bloom intensity={1.15} radius={0.8} threshold={0.0} />
