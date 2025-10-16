@@ -15,8 +15,9 @@ export default function Menu() {
     <nav
       style={{
         padding: '2rem',
-        backgroundColor: '#0b100a',
+        backgroundColor: location.pathname === '/blackHole' ? 'rgba(11, 16, 10, 0)' : '#0b100a',
         position: 'fixed',
+
         width: '100%',
         top: 0,
         zIndex: 10,

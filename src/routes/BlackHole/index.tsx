@@ -8,16 +8,6 @@ import { EffectComposer, Bloom } from '@react-three/postprocessing';
 const GOLD = new THREE.Color('#e7b84a');
 const BG = '#0b100a';
 
-// function Core() {
-//   // disco negro
-//   return (
-//     <mesh position={[0, 0, 0]}>
-//       <circleGeometry args={[2.4, 256]} />
-//       <meshBasicMaterial color="black" />
-//     </mesh>
-//   )
-// }
-
 function Core3D() {
   const uniforms = useMemo(
     () => ({
@@ -155,12 +145,12 @@ export const BlackHole = () => {
           <Bloom intensity={1.15} radius={0.8} threshold={0.0} />
         </EffectComposer>
 
-        <OrbitControls
+        {/* <OrbitControls
           enablePan={false}
           enableZoom={true}
           rotateSpeed={0.25}
           onChange={e => console.log(e?.target?.object.position)}
-        />
+        /> */}
       </Canvas>
     </div>
   );
