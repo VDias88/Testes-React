@@ -78,7 +78,7 @@ function Core3D() {
 }
 
 function DustInfall() {
-  const COUNT = 25000;
+  const COUNT = 30000;
   const geom = useMemo(() => new THREE.BufferGeometry(), []);
   const positions = useMemo(() => new Float32Array(COUNT * 3), [COUNT]);
   const speeds = useMemo(() => new Float32Array(COUNT), [COUNT]);
@@ -87,12 +87,15 @@ function DustInfall() {
 
   useMemo(() => {
     for (let i = 0; i < COUNT; i++) {
+      // const r = (radii[i] =
+      //   THREE.MathUtils.mapLinear(Math.random(), 0, 1, 2, 8.0) * (1 + Math.random() * 0.2));
       const r = (radii[i] =
-        THREE.MathUtils.mapLinear(Math.random(), 0, 1, 3.2, 8.0) * (1 + Math.random() * 0.2));
+        THREE.MathUtils.mapLinear(Math.random(), 0, 1, 2, 14.0) * (1 + Math.random() * 0.2));
+
       angles[i] = Math.random() * Math.PI * 2;
       speeds[i] = THREE.MathUtils.randFloat(0.18, 0.55);
       positions[i * 3 + 0] = Math.cos(angles[i]) * r;
-      positions[i * 3 + 1] = Math.sin(angles[i]) * r;
+      positions[i * 3 + 1] = Math.sin(angles[i]) * r; // flat disk
       positions[i * 3 + 2] = (Math.random() - 0.5) * 0.25;
     }
     geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -107,7 +110,7 @@ function DustInfall() {
       r -= speeds[i] * d * (0.6 + 1.2 * (1.0 / (0.2 + r)));
       ang += d * (0.25 + 2.0 / (0.2 + r));
       if (r < 2.5) {
-        r = radii[i] = THREE.MathUtils.randFloat(6.0, 8.5);
+        r = radii[i] = THREE.MathUtils.randFloat(10.0, 14.5);
         ang = angles[i] = Math.random() * Math.PI * 2;
         speeds[i] = THREE.MathUtils.randFloat(0.18, 0.55);
         pos[i * 3 + 2] = (Math.random() - 0.5) * 0.25;
@@ -125,11 +128,11 @@ function DustInfall() {
     <points geometry={geom}>
       <pointsMaterial
         color={GOLD}
-        size={0.015}
+        size={0.025}
         transparent
-        opacity={0.9}
-        depthWrite={false}
+        opacity={1.0}
         blending={THREE.AdditiveBlending}
+        depthWrite={false}
       />
     </points>
   );
@@ -140,13 +143,13 @@ export const BlackHole = () => {
     <div className="black-hole-container">
       <Canvas
         gl={{ powerPreference: 'high-performance', antialias: true }}
-        camera={{ position: [0, 0, 9], fov: 50 }}
+        camera={{ position: [76, -54, 67], fov: 50 }}
         onCreated={({ gl }) => {
           gl.setClearColor(BG);
           gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         }}>
-        <Core3D />
         <DustInfall />
+        <Core3D />
 
         <EffectComposer>
           <Bloom intensity={1.15} radius={0.8} threshold={0.0} />
@@ -154,9 +157,9 @@ export const BlackHole = () => {
 
         <OrbitControls
           enablePan={false}
-          enableZoom={false}
+          enableZoom={true}
           rotateSpeed={0.25}
-          onChange={e => console.log(e?.target)}
+          onChange={e => console.log(e?.target?.object.position)}
         />
       </Canvas>
     </div>

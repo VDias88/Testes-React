@@ -1,13 +1,15 @@
 html,
 body,
-#root {
+#root
+ {
   height: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
 }
 
-.black-hole-container {
+.black-hole-container
+ {
   position: relative;
   display: flex;
   align-items: center;
@@ -17,7 +19,8 @@ body,
   background: black;
 }
 
-.black-hole-container::after {
+.black-hole-container::after
+ {
   content: '';
   position: fixed;
   inset: 0;
@@ -30,7 +33,8 @@ body,
   );
 }
 
-canvas {
+canvas
+ {
   display: block;
   width: 100%;
   height: 100%;
