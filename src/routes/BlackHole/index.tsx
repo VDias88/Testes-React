@@ -6,7 +6,7 @@ import { OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 
 const GOLD = new THREE.Color('#e7b84a');
-const BG = '#0b100a';
+const BG = '#000000ff';
 
 function Core3D() {
   const uniforms = useMemo(
@@ -41,10 +41,8 @@ function Core3D() {
           uniform vec3 uColorEdge;
 
           void main() {
-            // centro negro profundo
             float fresnel = pow(1.0 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
             vec3 color = mix(uColorCenter, uColorEdge, fresnel);
-            // halo muito sutil
             float vignette = smoothstep(0.2, 1.0, fresnel);
             gl_FragColor = vec4(color, 1.0);
           }
@@ -53,14 +51,13 @@ function Core3D() {
     [uniforms],
   );
 
-  // rotação lenta
   const meshRef = useRef<THREE.Mesh>(null);
   useFrame((_, dt) => {
     if (meshRef.current) meshRef.current.rotation.y += dt * 0.1;
   });
 
   return (
-    <mesh ref={meshRef}>
+    <mesh ref={meshRef} renderOrder={0}>
       <sphereGeometry args={[2.4, 128, 128]} />
       <primitive object={mat} attach="material" />
     </mesh>
@@ -77,15 +74,13 @@ function DustInfall() {
 
   useMemo(() => {
     for (let i = 0; i < COUNT; i++) {
-      // const r = (radii[i] =
-      //   THREE.MathUtils.mapLinear(Math.random(), 0, 1, 2, 8.0) * (1 + Math.random() * 0.2));
       const r = (radii[i] =
         THREE.MathUtils.mapLinear(Math.random(), 0, 1, 2, 14.0) * (1 + Math.random() * 0.2));
 
       angles[i] = Math.random() * Math.PI * 2;
       speeds[i] = THREE.MathUtils.randFloat(0.18, 0.55);
       positions[i * 3 + 0] = Math.cos(angles[i]) * r;
-      positions[i * 3 + 1] = Math.sin(angles[i]) * r; // flat disk
+      positions[i * 3 + 1] = Math.sin(angles[i]) * r;
       positions[i * 3 + 2] = (Math.random() - 0.5) * 0.25;
     }
     geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -115,7 +110,7 @@ function DustInfall() {
   });
 
   return (
-    <points geometry={geom}>
+    <points geometry={geom} renderOrder={1}>
       <pointsMaterial
         color={GOLD}
         size={0.025}
@@ -123,6 +118,62 @@ function DustInfall() {
         opacity={1.0}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
+      />
+    </points>
+  );
+}
+
+function TwinklingStars() {
+  const COUNT = 5000;
+  const geom = useMemo(() => new THREE.BufferGeometry(), []);
+  const positions = useMemo(() => new Float32Array(COUNT * 3), [COUNT]);
+  const twinkle = useMemo(() => new Float32Array(COUNT), [COUNT]);
+  const twinkleSpeed = useMemo(() => new Float32Array(COUNT), [COUNT]);
+  const sizes = useMemo(() => new Float32Array(COUNT), [COUNT]);
+
+  useMemo(() => {
+    for (let i = 0; i < COUNT; i++) {
+      // Distribuir estrelas em uma esfera ao redor da cena
+      const radius = THREE.MathUtils.randFloat(50, 200);
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+
+      positions[i * 3 + 0] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = radius * Math.cos(phi);
+
+      twinkle[i] = Math.random();
+      twinkleSpeed[i] = THREE.MathUtils.randFloat(0.5, 2.0);
+      sizes[i] = THREE.MathUtils.randFloat(0.05, 0.15);
+    }
+    geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geom.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+  }, [geom, positions, twinkle, twinkleSpeed, sizes]);
+
+  const matRef = useRef<THREE.PointsMaterial>(null);
+
+  useFrame(state => {
+    const time = state.clock.elapsedTime;
+
+    // Atualizar opacidade baseada no twinkle
+    if (matRef.current) {
+      // Ciclo de cintilação geral
+      const baseOpacity = 0.4 + Math.sin(time * 0.5) * 0.1;
+      matRef.current.opacity = baseOpacity;
+    }
+  });
+
+  return (
+    <points geometry={geom}>
+      <pointsMaterial
+        ref={matRef}
+        color="#ffffff"
+        size={0.1}
+        transparent
+        opacity={0.5}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+        sizeAttenuation={true}
       />
     </points>
   );
@@ -138,6 +189,7 @@ export const BlackHole = () => {
           gl.setClearColor(BG);
           gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         }}>
+        <TwinklingStars />
         <DustInfall />
         <Core3D />
 
@@ -145,12 +197,12 @@ export const BlackHole = () => {
           <Bloom intensity={1.15} radius={0.8} threshold={0.0} />
         </EffectComposer>
 
-        {/* <OrbitControls
+        <OrbitControls
           enablePan={false}
           enableZoom={true}
           rotateSpeed={0.25}
           onChange={e => console.log(e?.target?.object.position)}
-        /> */}
+        />
       </Canvas>
     </div>
   );
