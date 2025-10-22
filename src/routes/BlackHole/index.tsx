@@ -199,9 +199,11 @@ export const BlackHole = () => {
 
         <OrbitControls
           enablePan={false}
-          enableZoom={true}
-          rotateSpeed={0.25}
-          onChange={e => console.log(e?.target?.object.position)}
+          enableZoom={false}
+          rotateSpeed={0.4}
+          zoomSpeed={0.6}
+          minDistance={30}
+          maxDistance={150}
         />
       </Canvas>
     </div>

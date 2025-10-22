@@ -3,8 +3,8 @@ import Menu from '@components/Menu';
 import { Route, Routes } from 'react-router';
 import Home from './routes/Home';
 import { BlackHole } from './routes/BlackHole';
-import Teste from './routes/Teste';
-
+import Componentes from './routes/Componentes';
+//TODO: remover css styles e adiconar stylesheets
 export default function App() {
   return (
     <>
@@ -12,7 +12,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/blackHole" element={<BlackHole />} />
-        <Route path="/test" element={<Teste />} />
+        <Route path="/Components" element={<Componentes />} />
       </Routes>
     </>
   );

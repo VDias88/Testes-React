@@ -28,8 +28,8 @@ export default function Menu() {
       <Link to="/blackHole" style={linkStyle('/blackHole')}>
         BlackRole
       </Link>
-      <Link to="/teste" style={linkStyle('/teste')}>
-        Teste
+      <Link to="/Components" style={linkStyle('/Components')}>
+        Components
       </Link>
     </nav>
   );
