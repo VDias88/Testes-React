@@ -6,21 +6,7 @@ import { OrbitControls, Html, useProgress } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 
 const GOLD = new THREE.Color('#e7b84a');
-const BG = '#000000ff';
-
-/** ===== Loader ===== */
-function Loader() {
-  const { progress } = useProgress();
-
-  return (
-    <Html center /* fixa no centro do canvas */>
-      <div className="bh-loader">
-        <div className="bh-spinner" />
-        <div className="bh-label">Carregando… {Math.round(progress)}%</div>
-      </div>
-    </Html>
-  );
-}
+const BG = '#000000';
 
 function Core3D() {
   const uniforms = useMemo(
@@ -220,7 +206,7 @@ export const BlackHole = () => {
         gl={{ powerPreference: 'high-performance', antialias: true }}
         camera={{ position: [76, -54, 67], fov: 50 }}
         onCreated={({ gl, scene }) => {
-          gl.setClearColor('#000000ff');
+          gl.setClearColor(BG);
           gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
           requestAnimationFrame(() => setReady(true));
         }}>
