@@ -1,12 +1,26 @@
 import * as THREE from 'three';
 import './styles.css';
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, Html, useProgress } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 
 const GOLD = new THREE.Color('#e7b84a');
 const BG = '#000000ff';
+
+/** ===== Loader ===== */
+function Loader() {
+  const { progress } = useProgress();
+
+  return (
+    <Html center /* fixa no centro do canvas */>
+      <div className="bh-loader">
+        <div className="bh-spinner" />
+        <div className="bh-label">Carregando… {Math.round(progress)}%</div>
+      </div>
+    </Html>
+  );
+}
 
 function Core3D() {
   const uniforms = useMemo(
@@ -133,7 +147,6 @@ function TwinklingStars() {
 
   useMemo(() => {
     for (let i = 0; i < COUNT; i++) {
-      // Distribuir estrelas em uma esfera ao redor da cena
       const radius = THREE.MathUtils.randFloat(50, 200);
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
@@ -151,60 +164,72 @@ function TwinklingStars() {
   }, [geom, positions, twinkle, twinkleSpeed, sizes]);
 
   const matRef = useRef<THREE.PointsMaterial>(null);
+  const groupRef = useRef<THREE.Group>(null);
 
   useFrame(state => {
     const time = state.clock.elapsedTime;
 
-    // Atualizar opacidade baseada no twinkle
     if (matRef.current) {
-      // Ciclo de cintilação geral
       const baseOpacity = 0.4 + Math.sin(time * 0.5) * 0.1;
       matRef.current.opacity = baseOpacity;
+    }
+
+    if (groupRef.current) {
+      const targetX = state.mouse.x * 0.5;
+      const targetY = state.mouse.y * 0.5;
+
+      groupRef.current.rotation.y += (targetX - groupRef.current.rotation.y) * 0.05;
+      groupRef.current.rotation.x += (targetY - groupRef.current.rotation.x) * 0.05;
     }
   });
 
   return (
-    <points geometry={geom}>
-      <pointsMaterial
-        ref={matRef}
-        color="#ffffff"
-        size={0.1}
-        transparent
-        opacity={0.5}
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-        sizeAttenuation={true}
-      />
-    </points>
+    <group ref={groupRef}>
+      <points geometry={geom}>
+        <pointsMaterial
+          ref={matRef}
+          color="#ffffff"
+          size={0.1}
+          transparent
+          opacity={0.5}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          sizeAttenuation
+        />
+      </points>
+    </group>
+  );
+}
+
+function BootLoaderOverlay() {
+  return (
+    <div className="bh-boot">
+      <div className="bh-spinner" />
+      <div className="bh-label">Carregando…</div>
+    </div>
   );
 }
 
 export const BlackHole = () => {
+  const [ready, setReady] = React.useState(false);
+
   return (
     <div className="black-hole-container">
+      {!ready && <BootLoaderOverlay />}
       <Canvas
         gl={{ powerPreference: 'high-performance', antialias: true }}
         camera={{ position: [76, -54, 67], fov: 50 }}
-        onCreated={({ gl }) => {
-          gl.setClearColor(BG);
+        onCreated={({ gl, scene }) => {
+          gl.setClearColor('#000000ff');
           gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+          requestAnimationFrame(() => setReady(true));
         }}>
         <TwinklingStars />
         <DustInfall />
         <Core3D />
-
         <EffectComposer>
           <Bloom intensity={1.15} radius={0.8} threshold={0.0} />
         </EffectComposer>
-
-        <OrbitControls
-          enablePan={false}
-          enableZoom={false}
-          rotateSpeed={0.4}
-          zoomSpeed={0.6}
-          minDistance={30}
-          maxDistance={150}
-        />
       </Canvas>
     </div>
   );
