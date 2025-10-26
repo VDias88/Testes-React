@@ -3,10 +3,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   width: 100%;
-  min-height: 100vh;
   background-color: #0b100a;
   color: #e7b84a;
   font-family: Roboto, sans-serif;
+}
+
+.section
+ {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 2rem;
+  box-sizing: border-box;
 }
