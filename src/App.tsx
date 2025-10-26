@@ -12,7 +12,6 @@ import '@fontsource/roboto/400-italic.css';
 export default function App() {
   return (
     <>
-      <Menu />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/blackHole" element={<BlackHole />} />

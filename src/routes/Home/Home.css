@@ -4,8 +4,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
   min-height: 100vh;
-  font-family: Roboto, sans-serif;
   background-color: #0b100a;
   color: #e7b84a;
+  font-family: Roboto, sans-serif;
 }

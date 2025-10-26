@@ -4,6 +4,7 @@ import React, { useMemo, useRef, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Html, useProgress } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import Menu from '@components/Menu';
 
 const GOLD = new THREE.Color('#e7b84a');
 const BG = '#000000';
@@ -200,23 +201,26 @@ export const BlackHole = () => {
   const [ready, setReady] = React.useState(false);
 
   return (
-    <div className="black-hole-container">
-      {!ready && <BootLoaderOverlay />}
-      <Canvas
-        gl={{ powerPreference: 'high-performance', antialias: true }}
-        camera={{ position: [76, -54, 67], fov: 50 }}
-        onCreated={({ gl, scene }) => {
-          gl.setClearColor(BG);
-          gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-          requestAnimationFrame(() => setReady(true));
-        }}>
-        <TwinklingStars />
-        <DustInfall />
-        <Core3D />
-        <EffectComposer>
-          <Bloom intensity={1.15} radius={0.8} threshold={0.0} />
-        </EffectComposer>
-      </Canvas>
+    <div className="container">
+      <Menu />
+      <div className="black-hole-container">
+        {!ready && <BootLoaderOverlay />}
+        <Canvas
+          gl={{ powerPreference: 'high-performance', antialias: true }}
+          camera={{ position: [76, -54, 67], fov: 50 }}
+          onCreated={({ gl, scene }) => {
+            gl.setClearColor(BG);
+            gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            requestAnimationFrame(() => setReady(true));
+          }}>
+          <TwinklingStars />
+          <DustInfall />
+          <Core3D />
+          <EffectComposer>
+            <Bloom intensity={1.15} radius={0.8} threshold={0.0} />
+          </EffectComposer>
+        </Canvas>
+      </div>
     </div>
   );
 };

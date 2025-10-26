@@ -1,27 +1,22 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import './index.css';
 
 export default function Menu() {
   const location = useLocation();
 
-  const linkStyle = (path: string) => ({
-    marginRight: '2rem',
+  const linkStyle = (path: string): React.CSSProperties => ({
+    margin: '0 1rem',
     textDecoration: location.pathname === path ? 'underline' : 'none',
     color: '#e7b84a',
     fontWeight: 500,
+    textAlign: 'center',
+    position: 'relative',
+    zIndex: 1,
   });
 
   return (
-    <nav
-      style={{
-        padding: '2rem',
-        backgroundColor: location.pathname === '/blackHole' ? 'rgba(11, 16, 10, 0)' : '#0b100a',
-        position: 'fixed',
-
-        width: '100%',
-        top: 0,
-        zIndex: 10,
-      }}>
+    <nav className="menu">
       <Link to="/" style={linkStyle('/')}>
         Home
       </Link>
