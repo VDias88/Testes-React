@@ -10,7 +10,7 @@ export default function Componentes() {
         <h1>Página de Components</h1>
         <p>Aqui temos alguns testes de componentes</p>
       </div>
-      <div className="section">
+      <div className="section" style={{ background: 'black' }}>
         <h1>Página de Components 2</h1>
         <p>Aqui temos alguns testes de componentes</p>
       </div>

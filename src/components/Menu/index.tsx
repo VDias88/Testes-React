@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './index.css';
+import GlassMenu from '@components/GlassMenu';
 
 export default function Menu() {
   const location = useLocation();
@@ -16,7 +17,18 @@ export default function Menu() {
   });
 
   return (
-    <nav className="menu">
+    <GlassMenu
+      width="80%"
+      height="3.5rem"
+      mixBlendMode="screen"
+      style={{
+        position: 'fixed',
+        zIndex: 10,
+        top: '2rem',
+        display: 'flex',
+        flexDirection: 'row',
+        padding: '0 1rem',
+      }}>
       <Link to="/" style={linkStyle('/')}>
         Home
       </Link>
@@ -26,6 +38,6 @@ export default function Menu() {
       <Link to="/Components" style={linkStyle('/Components')}>
         Components
       </Link>
-    </nav>
+    </GlassMenu>
   );
 }
