@@ -2,6 +2,7 @@ import React from 'react';
 import './Home.css';
 import Menu from '@components/Menu';
 import Aurora from '@components/Aurora';
+import ShinyText from '@components/ShinyText';
 
 export default function Home() {
   return (
@@ -14,8 +15,19 @@ export default function Home() {
         </header>
 
         <main className="hero-center">
-          <h1>Sala</h1>
-          <p>Bem-vindo ao laboratorio!</p>
+          <ShinyText
+            text="Bem-vindo ao laboratorio!"
+            speed={2}
+            delay={0}
+            fontSize="2.5rem"
+            color="black"
+            shineColor="red"
+            spread={120}
+            direction="left"
+            yoyo={false}
+            pauseOnHover={false}
+            disabled={false}
+          />
         </main>
       </div>
     </>

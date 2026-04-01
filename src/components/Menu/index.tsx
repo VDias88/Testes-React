@@ -28,6 +28,9 @@ export default function Menu() {
         display: 'flex',
         flexDirection: 'row',
         padding: '0 1rem',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: 'black',
       }}>
       <Link to="/" style={linkStyle('/')}>
         Home
