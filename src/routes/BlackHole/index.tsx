@@ -5,6 +5,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Html, useProgress } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import Menu from '@components/Menu';
+import { FeatureCard, MetricCard, ProfileCard, StatusCard } from '@components/Card';
 
 const GOLD = new THREE.Color('#e7b84a');
 const BG = '#000000';
@@ -425,6 +426,21 @@ export const BlackHole = () => {
   return (
     <div className="container">
       <Menu />
+      <div
+        style={{
+          position: 'fixed',
+          zIndex: 10,
+          top: '10rem',
+          display: 'flex',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          gap: '1rem',
+        }}>
+        <FeatureCard title="test" description="Descrição do teste" />
+        <MetricCard label="Teste" value={100} />
+        <ProfileCard initials="JD" name="John Doe" role="Developer" />
+        <StatusCard title="Status" subtitle="Online" status="active" />
+      </div>
       <div className="black-hole-container">
         {!ready && <BootLoaderOverlay />}
         <Canvas
