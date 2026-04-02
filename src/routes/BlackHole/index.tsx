@@ -426,21 +426,7 @@ export const BlackHole = () => {
   return (
     <div className="container">
       <Menu />
-      <div
-        style={{
-          position: 'fixed',
-          zIndex: 10,
-          top: '10rem',
-          display: 'flex',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: '1rem',
-        }}>
-        <FeatureCard title="test" description="Descrição do teste" />
-        <MetricCard label="Teste" value={100} />
-        <ProfileCard initials="JD" name="John Doe" role="Developer" />
-        <StatusCard title="Status" subtitle="Online" status="active" />
-      </div>
+
       <div className="black-hole-container">
         {!ready && <BootLoaderOverlay />}
         <Canvas

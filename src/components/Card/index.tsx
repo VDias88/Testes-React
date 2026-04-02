@@ -1,6 +1,5 @@
 import { useState, CSSProperties, ReactNode } from 'react';
 
-// ─── TOKENS ───────────────────────────────────────────────────────────────────
 const tokens = {
   gold: '#D4A73C',
   goldDim: 'rgba(212,167,60,0.6)',
@@ -20,7 +19,6 @@ const tokens = {
   fontMono: "'Space Mono', monospace",
 } as const;
 
-// ─── TYPES ────────────────────────────────────────────────────────────────────
 type BadgeVariant = 'gold' | 'success' | 'danger' | 'info' | 'default';
 type CardStatus = 'active' | 'warning' | 'critical' | 'idle';
 
@@ -77,7 +75,6 @@ interface StatusCardProps {
   progress?: number;
 }
 
-// ─── BADGE ────────────────────────────────────────────────────────────────────
 const badgeStyles: Record<BadgeVariant, CSSProperties> = {
   gold: {
     background: 'rgba(212,167,60,0.12)',
@@ -125,7 +122,6 @@ export function Badge({ children, variant = 'default' }: BadgeProps) {
   );
 }
 
-// ─── CARD BASE ────────────────────────────────────────────────────────────────
 export function Card({ children, accent = false, style = {}, onClick }: CardProps) {
   const [hovered, setHovered] = useState(false);
 
@@ -135,7 +131,6 @@ export function Card({ children, accent = false, style = {}, onClick }: CardProp
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        // background: hovered ? tokens.surfaceHover : tokens.surface,
         border: `0.5px solid ${hovered ? tokens.borderHover : tokens.border}`,
         borderLeft: accent ? `2px solid ${tokens.gold}` : undefined,
         borderRadius: 14,
@@ -152,7 +147,6 @@ export function Card({ children, accent = false, style = {}, onClick }: CardProp
   );
 }
 
-// ─── 1. FEATURE CARD ──────────────────────────────────────────────────────────
 export function FeatureCard({ icon, title, description, badge, accent = false }: FeatureCardProps) {
   return (
     <Card accent={accent}>
@@ -191,12 +185,10 @@ export function FeatureCard({ icon, title, description, badge, accent = false }:
   );
 }
 
-// ─── 2. METRIC CARD ───────────────────────────────────────────────────────────
 export function MetricCard({ label, value, delta, deltaPositive = true }: MetricCardProps) {
   return (
     <div
       style={{
-        // background: tokens.surface,
         border: `0.5px solid ${tokens.border}`,
         borderRadius: 14,
         padding: '1rem 1.2rem',
@@ -233,7 +225,6 @@ export function MetricCard({ label, value, delta, deltaPositive = true }: Metric
   );
 }
 
-// ─── 3. PROFILE CARD ─────────────────────────────────────────────────────────
 export function ProfileCard({ initials, name, role, details = [] }: ProfileCardProps) {
   return (
     <Card>
@@ -281,7 +272,6 @@ export function ProfileCard({ initials, name, role, details = [] }: ProfileCardP
   );
 }
 
-// ─── 4. STATUS / EVENT CARD ──────────────────────────────────────────────────
 const statusConfig: Record<CardStatus, { color: string; label: string }> = {
   active: { color: tokens.success, label: 'Active' },
   warning: { color: tokens.gold, label: 'Warning' },
@@ -290,7 +280,7 @@ const statusConfig: Record<CardStatus, { color: string; label: string }> = {
 };
 
 export function StatusCard({ title, subtitle, status, time, progress }: StatusCardProps) {
-  const s = statusConfig[status];
+  const statusCfg = statusConfig[status];
   const badgeVariant: BadgeVariant =
     status === 'active' ? 'success' : status === 'critical' ? 'danger' : 'gold';
 
@@ -312,7 +302,7 @@ export function StatusCard({ title, subtitle, status, time, progress }: StatusCa
           )}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-          <Badge variant={badgeVariant}>{s.label}</Badge>
+          <Badge variant={badgeVariant}>{statusCfg.label}</Badge>
           {time && (
             <span
               style={{
@@ -332,7 +322,7 @@ export function StatusCard({ title, subtitle, status, time, progress }: StatusCa
             <span style={{ fontSize: 10, color: tokens.textMuted, fontFamily: tokens.fontMono }}>
               progress
             </span>
-            <span style={{ fontSize: 10, color: s.color, fontFamily: tokens.fontMono }}>
+            <span style={{ fontSize: 10, color: statusCfg.color, fontFamily: tokens.fontMono }}>
               {progress}%
             </span>
           </div>
@@ -347,7 +337,7 @@ export function StatusCard({ title, subtitle, status, time, progress }: StatusCa
               style={{
                 height: '100%',
                 width: `${progress}%`,
-                background: s.color,
+                background: statusCfg.color,
                 borderRadius: 999,
                 opacity: 0.8,
                 transition: 'width 0.4s ease',
@@ -360,7 +350,6 @@ export function StatusCard({ title, subtitle, status, time, progress }: StatusCa
   );
 }
 
-// ─── DEMO PAGE ────────────────────────────────────────────────────────────────
 interface Section {
   label: string;
   content: ReactNode;
