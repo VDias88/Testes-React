@@ -1,11 +1,10 @@
 import * as THREE from 'three';
 import './styles.css';
-import React, { useMemo, useRef, Suspense } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Html, useProgress } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import Menu from '@components/Menu';
-import { FeatureCard, MetricCard, ProfileCard, StatusCard } from '@components/Card';
+import { MetricCard } from '@components/Card';
 
 const GOLD = new THREE.Color('#e7b84a');
 const BG = '#000000';
@@ -429,6 +428,7 @@ export const BlackHole = () => {
 
       <div className="black-hole-container">
         {!ready && <BootLoaderOverlay />}
+
         <Canvas
           gl={{ powerPreference: 'high-performance', antialias: true }}
           camera={{ position: [76, -54, 67], fov: 50 }}
